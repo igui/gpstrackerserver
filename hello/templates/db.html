@@ -3,18 +3,56 @@
 
 {% block content %}
   <div class="container">
-
-
-<h2>Page View Report</h2>
-
-
-<ul>
-
-{% for greeting in greetings %}
-    <li>{{ greeting.when }}</li>
-{% endfor %}
-
+  <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 500px;
+        width: 100%;
+      }
+    </style>
 </ul>
+
+	<div id="map"></div>
+    <script>
+      var map;
+      {% autoescape off %}
+      var locations = {{ encoded_locations }};
+      {% endautoescape %}
+
+      
+
+      function initMap() {
+      	var infowindow = new google.maps.InfoWindow({
+			
+	  	});
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 14,
+          center: new google.maps.LatLng(locations[0].lat, locations[0].lng),
+          mapTypeId: 'terrain'
+        });
+
+        locations.forEach(function(location, i){
+			var latLng = new google.maps.LatLng(location.lat,location.lng);
+			var marker = new google.maps.Marker({
+				position: latLng,
+				map: map,
+				label: (i+1 + ''),
+				title: 'Time: ' + location.when
+			});
+
+			marker.addListener('click', function() {
+				infowindow.setContent('Time <b>' + new Date(location.when).toString() + '</b>');
+				infowindow.open(map, marker);
+			});
+        });
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4Mk5PVskv_o6HUgnogUdTC81K2gdauY0&callback=initMap">
+    </script>
+  </body>
+
 
 </div>
 
